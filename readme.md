@@ -40,9 +40,9 @@ print('/'.join(words))
 
 ```python
 # 自定义字典 test_string.txt
-光荣事业 2 nz
-中国梦 2 nl
-奠定基础 1 nz
+光荣事业 4 nz
+中国梦 4 nl
+奠定基础 4 nz
 # 自定义字典实现
 jieba.load_userdict('test_string.txt')
 words=jieba.cut(test_string)
@@ -105,3 +105,52 @@ for word, flag in words:
 
 
 ```
+## 问题及解决方案
+
+>在加载自定义字典时，自定义字典文件内容及有问题代码单独存放文件如下：
+
+```html
+
+----------自定义字典文件test_string.txt--------
+光荣事业 4 nz
+中国梦 4 nl
+奠定基础 4 nz
+----------issue.py----------
+import jieba
+test_string=("医疗卫生事业是强国安民的光荣事业，是为实现中国梦奠定基础的伟大事业。")
+words=jieba.cut(test_string)
+print('jieba默认分词效果')
+print('/'.join(words))
+# 加载自定义字典
+jieba.load_userdict('test_string.txt')
+words=jieba.cut(test_string)
+print("加载自定义字典后，分词效果")
+print('/'.join(words))
+----------output----------
+医疗卫生/事业/是/强国/安民/的/光荣/事业/，/是/为/实现/中国/梦/奠定/基础/的/伟大事业/。
+加载自定义字典后，分词效果
+医疗卫生/事业/是/强国/安民/的/光荣事业/，/是/为/实现/中国/梦/奠定基础/的/伟大事业/。
+```
+
+>观察以上output会发现，光荣事业跟奠定基础按照了字典文件进行了合并，但是中国梦并没有，这是什么问题呢？
+
+```html
+于是得出以下结论：
+jieba 分词自定义词典只对长词起作用
+对如果定义的词比jieba自己分的短，则没有用
+```
+>那如何解决呢？
+
+```python
+将issue.py中的jieba.load_userdict('test_string.txt')
+替换为jieba.set_dictionary('test_string.txt')
+此时输出：
+jieba默认分词效果
+医疗卫生/事业/是/强国/安民/的/光荣/事业/，/是/为/实现/中国/梦/奠定/基础/的/伟大事业/。
+加载自定义字典后，分词效果
+医疗/卫生/事业/是/强国安民/的/光荣事业/，/是/为/实现/中国梦/奠定基础/的/伟大事业/。
+```
+
+>参考资料
+### [jieba 分词自定义词典问题](https://blog.csdn.net/u013378306/article/details/64126358)
+### [通过用户自定义词典来增强歧义纠错能力](https://github.com/fxsjy/jieba/issues/14)
