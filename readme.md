@@ -142,6 +142,7 @@ jieba 分词自定义词典只对长词起作用
 >那如何解决呢？
 
 ```python
+直接改变主字典路径(0.28 之前的版本是不能指定主词典的路径的，有了延迟加载机制后，你可以改变主词典的路径)，不用jieba默认的：
 将issue.py中的jieba.load_userdict('test_string.txt')
 替换为jieba.set_dictionary('test_string.txt')
 此时输出：
